@@ -1,0 +1,7 @@
+
+## cCreating stack command
+  aws cloudformation create-stack  --stack-name myFirstTest --region us-east-1 --template-body file://testcfn.yml
+## update stack command
+  aws cloudformation update-stack  --stack-name myFirstTest --region us-east-1 --template-body file://testcfn.yml
+## Describe stack command
+   aws cloudformation describe-stacks --stack-name myFirstTest 
