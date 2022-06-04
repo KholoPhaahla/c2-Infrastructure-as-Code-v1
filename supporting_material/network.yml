@@ -6,7 +6,7 @@ Description: >
     and default routes for them in the private subnets.
 
 Parameters:
-
+# used to pass paramenter to the script
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names
         Type: String
@@ -63,10 +63,10 @@ Resources:
     PublicSubnet1: 
         Type: AWS::EC2::Subnet
         Properties:
-            VpcId: !Ref VPC
-            AvailabilityZone: !Select [ 0, !GetAZs '' ]
+            VpcId: !Ref VPC # add subnet to the VPC
+            AvailabilityZone: !Select [ 0, !GetAZs '' ] #picks a value from list to makesure that they are at different regions
             CidrBlock: !Ref PublicSubnet1CIDR
-            MapPublicIpOnLaunch: true
+            MapPublicIpOnLaunch: true # get pulic ip or not / routoing rules superceide 
             Tags: 
                 - Key: Name 
                   Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
@@ -104,9 +104,9 @@ Resources:
                 - Key: Name 
                   Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
 
-    NatGateway1EIP:
+    NatGateway1EIP: # allocate your own IP means not disposable Static IP
         Type: AWS::EC2::EIP
-        DependsOn: InternetGatewayAttachment
+        DependsOn: InternetGatewayAttachment # wait for another resource to complete/ specifies the order of orchastration
         Properties: 
             Domain: vpc
 
@@ -120,7 +120,7 @@ Resources:
         Type: AWS::EC2::NatGateway
         Properties: 
             AllocationId: !GetAtt NatGateway1EIP.AllocationId
-            SubnetId: !Ref PublicSubnet1
+            SubnetId: !Ref PublicSubnet1 # attach NatGateway to subnes 
 
     NatGateway2: 
         Type: AWS::EC2::NatGateway
@@ -157,7 +157,7 @@ Resources:
             SubnetId: !Ref PublicSubnet2
     
 
-    PrivateRouteTable1:
+    PrivateRouteTable1: # separate for security reasons
         Type: AWS::EC2::RouteTable
         Properties: 
             VpcId: !Ref VPC
@@ -199,7 +199,7 @@ Resources:
             RouteTableId: !Ref PrivateRouteTable2
             SubnetId: !Ref PrivateSubnet2
 
-Outputs: 
+Outputs: # capture values to reuse later
 
     VPC: 
         Description: A reference to the created VPC
@@ -211,7 +211,7 @@ Outputs:
         Description: Public Routing
         Value: !Ref PublicRouteTable
         Export:
-          Name: !Sub ${EnvironmentName}-PUB-RT
+          Name: !Sub ${EnvironmentName}-PUB-RT #!Sub replace with value
 
     VPCPrivateRouteTable1:
         Description: Private Routing AZ1
@@ -227,7 +227,7 @@ Outputs:
 
     PublicSubnets:
         Description: A list of the public subnets
-        Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
+        Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]] # take string and combine them
         Export:
           Name: !Sub ${EnvironmentName}-PUB-NETS
 

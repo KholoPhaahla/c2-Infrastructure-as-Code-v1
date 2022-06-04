@@ -3,7 +3,7 @@ Description: >
 
 Parameters:
 
-    EnvironmentName:
+    EnvironmentName: # deploy in the network created
         Description: An environment name that will be prefixed to resource names
         Type: String
 Resources:
