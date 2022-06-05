@@ -7,8 +7,8 @@ Parameters:
         Description: An environment name that will be prefixed to resource names
         Type: String
 Resources:
-  LBSecGroup:
-    Type: AWS::EC2::SecurityGroup
+  LBSecGroup: #  load balance security group
+    Type: AWS::EC2::SecurityGroup # associated with Server instance Traffic filter 
     Properties:
       GroupDescription: Allow http to our load balancer
       VpcId:
@@ -18,7 +18,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        CidrIp: 0.0.0.0/0
+        CidrIp: 0.0.0.0/0 # allow tcp traffic from any where via port 80 
       SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 80
@@ -40,7 +40,7 @@ Resources:
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
+      SecurityGroupEgress: # out bound rule
       - IpProtocol: tcp
         FromPort: 0
         ToPort: 65535
@@ -60,11 +60,11 @@ Resources:
       KeyName: nd9990_keypair
       SecurityGroups:
       - Ref: WebServerSecGroup
-      InstanceType: t3.medium
+      InstanceType: t3.medium # specifies RAM and CPU
       BlockDeviceMappings:
       - DeviceName: "/dev/sdk"
         Ebs:
-          VolumeSize: '10'
+          VolumeSize: '10' # size of the harddrive
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -108,16 +108,16 @@ Resources:
         ListenerArn: !Ref 'Listener'
         Priority: 1
   WebAppTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup # heath checks for deployed server 
     Properties:
       HealthCheckIntervalSeconds: 10
       HealthCheckPath: /
       HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 8
-      HealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 8 # request yes/no if none unheatlh
+      HealthyThresholdCount: 2 # valid declare health
       Port: 8080
       Protocol: HTTP
-      UnhealthyThresholdCount: 5
+      UnhealthyThresholdCount: 5 # retry 5 times failer declare unhealth
       VpcId: 
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
